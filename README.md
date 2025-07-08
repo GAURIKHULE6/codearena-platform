@@ -16,18 +16,19 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## 📸 Screenshots
 
+## 📸 Screenshots
+
 ### 🔐 Login Page
-![Login Page](./public/screenshots/login-page.png)
+![Login Page](public/screenshots/login-page.png)
 
 ### 📄 Problem List
-![Problem List](./public/screenshots/problem-list.png)
+![Problem List](public/screenshots/problem-list.png)
 
 ### 🧠 Code Editor
-![Code Editor](./public/screenshots/editor-page.png)
+![Code Editor](public/screenshots/editor-page.png)
 
 ---
 
 ## 🎥 Demo Recording
 
-![Demo GIF](./public/screenshots/demo.gif)
-
+![Demo GIF](public/screenshots/demo.gif.mp4)

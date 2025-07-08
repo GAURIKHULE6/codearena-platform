@@ -31,4 +31,4 @@ If you are developing a production application, we recommend using TypeScript wi
 
 ## 🎥 Demo Recording
 
-![Demo GIF](public/screenshots/demo.gif.mp4)
+![Demo GIF](public/screenshots/demo.mp4)

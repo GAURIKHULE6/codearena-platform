@@ -17,17 +17,17 @@ If you are developing a production application, we recommend using TypeScript wi
 ## 📸 Screenshots
 
 ### 🔐 Login Page
-![Login Page](./hacker-rank-clone/public/screenshots/login-page.png)
+![Login Page](./public/screenshots/login-page.png)
 
 ### 📄 Problem List
-![Problem List](./hacker-rank-clone/public/screenshots/problem-list.png)
+![Problem List](./public/screenshots/problem-list.png)
 
 ### 🧠 Code Editor
-![Code Editor](./hacker-rank-clone/public/screenshots/editor-page.png)
+![Code Editor](./public/screenshots/editor-page.png)
 
 ---
 
 ## 🎥 Demo Recording
 
-![Demo GIF](./hacker-rank-clone/public/screenshots/demo.gif)
+![Demo GIF](./public/screenshots/demo.gif)
 

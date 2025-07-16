@@ -1,3 +1,4 @@
+// routes/submissions.js
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
@@ -5,25 +6,20 @@ const db = require('../db');
 router.post('/', (req, res) => {
   const { user_id, problem_id, code, output, is_correct } = req.body;
 
-  db.query(
-    'INSERT INTO submissions (user_id, problem_id, code, output, is_correct) VALUES (?, ?, ?, ?, ?)',
-    [user_id, problem_id, code, output, is_correct],
-    (err, result) => {
-      if (err) return res.status(500).send(err);
-      res.send({ success: true, id: result.insertId });
-    }
-  );
-});
+  console.log("📩 Received:", req.body);
 
-router.get('/user/:user_id', (req, res) => {
-  db.query(
-    'SELECT * FROM submissions WHERE user_id = ?',
-    [req.params.user_id],
-    (err, results) => {
-      if (err) return res.status(500).send(err);
-      res.send(results);
+  const sql = `
+    INSERT INTO submissions (user_id, problem_id, code, output, is_correct)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [user_id, problem_id, code, output, is_correct], (err, result) => {
+    if (err) {
+      console.error('❌ DB Error:', err);
+      return res.status(500).json({ message: 'Database error', error: err });
     }
-  );
+    res.status(201).json({ message: '✅ Submission saved!', id: result.insertId });
+  });
 });
 
 module.exports = router;

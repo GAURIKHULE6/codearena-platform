@@ -1,12 +1,21 @@
 export const problems = [
-  {
-    id: 1,
-    title: "Sum of Two Numbers",
-    description: "Input 2 numbers and output their sum.",
-    starterCode: "a = int(input())\nb = int(input())\n# Your code here",
-    expectedOutput: "7",
-    languageId: 71
-  },
+{
+  id: 1,
+  title: "Sum of Two Numbers",
+  description: "Given two integers A and B, return their sum.",
+  input_format: "Two integers A and B",
+  output_format: "A single integer, the sum of A and B",
+  constraints: "1 <= A, B <= 1000",
+  sample_input: "2 3",
+  sample_output: "5",
+  starter_code: "int main() {\n  // your code here\n  return 0;\n}",
+  test_cases: JSON.stringify([
+    { input: "2 3", expected_output: "5" },
+    { input: "10 20", expected_output: "30" }
+  ]),
+  language_id: 50, // C
+},
+
   {
     id: 2,
     title: "Even or Odd",

@@ -1,17 +1,23 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-const Navbar = ({ username, onLogout }) => {
+const Navbar = ({ username, role, onLogout }) => {
+    console.log("Navbar Role:", role); // 🐞 Debug
+
   return (
     <nav className="navbar">
-      <div className="nav-left">
-        <h2 className="logo">CodeArena</h2>
-        <a href="#">🏠 Home</a>
-        <a href="#">🧠 Problems</a>
-        <a href="#">📊 Submissions</a>
+      <div className="navbar-left">
+        <span className="logo">CodeArena</span>
+        <Link className="nav-link" to="/">🏠 Home</Link>
+        <Link className="nav-link" to="/problems">🧠 Problems</Link>
+        {role === 'admin' && (
+          <Link className="nav-link" to="/admin">🛠 Admin Panel</Link>
+        )}
+        <Link className="nav-link" to="/submissions">📊 Submissions</Link>
       </div>
-      <div className="nav-right">
-        <span>👋 Hi, {username}</span> {/* ✅ username is just string now */}
-        <button onClick={onLogout}>Logout</button>
+      <div className="navbar-right">
+        <span className="user-text">👋 Hi, {username}</span>
+        <button className="logout-btn" onClick={onLogout}>Logout</button>
       </div>
     </nav>
   );

@@ -1,118 +1,155 @@
-import React, { useState } from 'react';
+// ✅ UPDATED CODE EDITOR COMPONENT (CodeEditor.jsx)
+import React, { useState, useEffect } from 'react';
+import Editor from '@monaco-editor/react';
 import axios from 'axios';
+import '../style.css';
 
-const Editor = ({ problem }) => {
-  const [code, setCode] = useState(problem.starterCode || '');
-  const [languageId, setLanguageId] = useState(problem.languageId || 71);
+const CodeEditor = ({ problem, user }) => {
+  const [code, setCode] = useState(problem?.starter_code || '');
+  const [languageId, setLanguageId] = useState(problem?.language_id || 71);
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
   const [verdict, setVerdict] = useState('');
+  const [running, setRunning] = useState(false);
 
-const handleRun = async () => {
-  setOutput('⏳ Running...');
-  setVerdict('');
-  try {
-    const submission = await axios.post(
-      'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true',
-      {
-        source_code: code,
-        stdin: input,
-        language_id: languageId,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-RapidAPI-Key': '19efc6ac41mshd0b8284c139aecbp158050jsn7e6f6aa3bc69',
-          'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-        },
-      }
-    );
+  const languageMap = {
+    71: 'python', 54: 'cpp', 62: 'java', 63: 'javascript', 50: 'c'
+  };
 
-    const result = submission.data;
-    if (result.stderr) {
-      setOutput(result.stderr);
-      setVerdict('❌ Error in execution.');
-    } else if (result.compile_output) {
-      setOutput(result.compile_output);
-      setVerdict('❌ Compilation error.');
-    } else {
-      const actual = (result.stdout || '').trim();
-      const expected = (problem.expectedOutput || '').trim();
-
-      setOutput(actual);
-
-      if (expected) {
-        const isCorrect = actual === expected;
-        if (isCorrect) {
-          setVerdict('✅ Correct Output! 🎉');
-
-          const scores = JSON.parse(localStorage.getItem('scores')) || {};
-          scores[problem.id] = true;
-          localStorage.setItem('scores', JSON.stringify(scores));
-        } else {
-          setVerdict('❌ Incorrect Output.');
-        }
-
-        // 👇 Submit to local backend
-        const user = JSON.parse(localStorage.getItem('user')); // Make sure you store user info in localStorage
-        if (user) {
-          await axios.post('http://localhost:5000/api/submissions', {
-            user_id: user.id,
-            problem_id: problem.id,
-            code,
-            output: actual,
-            is_correct: isCorrect,
-          });
-        }
-      }
+  useEffect(() => {
+    if (problem) {
+      setCode(problem.starter_code || '');
     }
-  } catch (err) {
-    setOutput('❌ Error running code.');
-    setVerdict('❌ Failed to connect to server.');
-    console.error(err);
-  }
-};
+  }, [problem]);
+
+  const handleRun = async () => {
+    setRunning(true);
+    setOutput('');
+    setVerdict('');
+
+    try {
+      const testCases = problem.test_cases
+        ? JSON.parse(problem.test_cases)
+        : [{ input, expected_output: problem.expected_output }];
+
+      let allPassed = true;
+      let combined = '';
+
+      for (const tc of testCases) {
+        const res = await axios.post(
+          'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true',
+          {
+            source_code: code,
+            stdin: tc.input,
+            language_id: languageId,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'X-RapidAPI-Key': '19efc6ac41mshd0b8284c139aecbp158050jsn7e6f6aa3bc69',
+              'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
+            },
+          }
+        );
+
+        const out = (res.data.stdout || '').trim();
+        const exp = (tc.expected_output || '').trim();
+        combined += `🧪 Input:\n${tc.input}\n✅ Expected:\n${exp}\n💡 Actual:\n${out}\n\n`;
+        if (out !== exp) allPassed = false;
+      }
+
+      setOutput(combined.trim());
+      setVerdict(allPassed ? '✅ All test cases passed!' : '❌ Some test cases failed.');
+
+      if (user) {
+        await axios.post('http://localhost:5000/api/submissions', {
+          user_id: user.id,
+          problem_id: problem.id,
+          code,
+          output: combined.trim(),
+          is_correct: allPassed,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      setOutput('❌ Error running code.');
+      setVerdict('❌ Server error or invalid code.');
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  if (!problem) return <div className="no-problem">🛑 Please select a problem to solve.</div>;
+
   return (
     <div className="editor-container">
-      <label><strong>Language:</strong></label>
-      <select
-        value={languageId}
-        onChange={(e) => setLanguageId(Number(e.target.value))}
-      >
-        <option value={71}>Python 3</option>
-        <option value={54}>C++</option>
-        <option value={62}>Java</option>
-        <option value={63}>JavaScript</option>
-        <option value={50}>C</option>
-      </select>
+      <h2>💻 {problem.title}</h2>
 
-      <textarea
-        className="code-editor"
+      {/* ✅ Problem Details */}
+<div className="problem-details">
+  {problem.description && (
+    <p><strong>Description:</strong> {problem.description}</p>
+  )}
+  {problem.input_format && (
+    <p><strong>Input Format:</strong> <pre>{problem.input_format}</pre></p>
+  )}
+  {problem.output_format && (
+    <p><strong>Output Format:</strong> <pre>{problem.output_format}</pre></p>
+  )}
+  {problem.constraints && (
+    <p><strong>Constraints:</strong> <pre>{problem.constraints}</pre></p>
+  )}
+  {problem.sample_input && (
+    <p><strong>Sample Input:</strong> <pre>{problem.sample_input}</pre></p>
+  )}
+  {problem.sample_output && (
+    <p><strong>Sample Output:</strong> <pre>{problem.sample_output}</pre></p>
+  )}
+</div>
+
+      {/* ✅ Language Selector */}
+      <div className="editor-controls">
+        <label><strong>Language:</strong></label>
+        <select value={languageId} onChange={(e) => setLanguageId(Number(e.target.value))}>
+          <option value={71}>Python</option>
+          <option value={54}>C++</option>
+          <option value={62}>Java</option>
+          <option value={63}>JavaScript</option>
+          <option value={50}>C</option>
+        </select>
+      </div>
+
+      {/* ✅ Monaco Editor */}
+      <Editor
+        height="400px"
+        theme="vs-dark"
+        language={languageMap[languageId]}
         value={code}
-        onChange={(e) => setCode(e.target.value)}
-        placeholder="Write your code here..."
+        onChange={(value) => setCode(value)}
+        options={{ fontSize: 14, minimap: { enabled: false } }}
       />
 
-      <label><strong>Custom Input:</strong></label>
+      {/* ✅ Input Field */}
+      <label><strong>Custom Input (optional):</strong></label>
       <textarea
         className="input-box"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Input for stdin..."
+        placeholder="Enter input for manual testing"
       />
 
-      <button className="run-btn" onClick={handleRun}>▶️ Run Code</button>
+      {/* ✅ Run Code Button */}
+      <button className="run-btn" onClick={handleRun} disabled={running}>
+        {running ? '⏳ Running...' : '▶️ Run Code'}
+      </button>
 
+      {/* ✅ Output Section */}
       <label><strong>Output:</strong></label>
       <pre className="output-box">{output}</pre>
 
-      {verdict && (
-        <p style={{ fontWeight: 'bold', color: verdict.includes('✅') ? 'green' : 'red' }}>
-          {verdict}
-        </p>
-      )}
+      {verdict && <p className="verdict">{verdict}</p>}
     </div>
   );
 };
 
-export default Editor;
+export default CodeEditor;

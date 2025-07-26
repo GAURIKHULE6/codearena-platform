@@ -1,11 +1,13 @@
 // components/Login.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../style.css';
 
 const Login = ({ onLogin, switchToSignup }) => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -14,12 +16,16 @@ const Login = ({ onLogin, switchToSignup }) => {
     try {
       const res = await axios.post('http://localhost:5000/api/auth/login', form);
       localStorage.setItem('user', JSON.stringify(res.data.user));
-      localStorage.setItem('token', res.data.token); // ✅ Store token
+      localStorage.setItem('token', res.data.token);
       onLogin(res.data.user);
     } catch (err) {
       console.error('❌ Login error:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Login failed. Try again.');
     }
+  };
+
+  const goToAdminLogin = () => {
+    navigate('/admin-login'); // ✅ corrected from /admin-dashboard
   };
 
   return (
@@ -44,6 +50,9 @@ const Login = ({ onLogin, switchToSignup }) => {
         <button type="submit">Login</button>
         <p className="switch-text">
           Don't have an account? <span onClick={switchToSignup}>Sign up</span>
+        </p>
+        <p className="switch-text">
+          Login as Admin? <span onClick={goToAdminLogin}>Click here</span>
         </p>
       </form>
     </div>

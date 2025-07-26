@@ -16,9 +16,9 @@ const Homepage = () => {
           <h3>💻 Code Editor</h3>
           <p>Write, test, and debug your code online.</p>
         </Link>
-        <Link to="/admin" className="home-card">
-          <h3>🛠 Admin Panel</h3>
-          <p>Manage problems and test cases (admin only).</p>
+        <Link to="/leaderboard" className="home-card">
+          <h3>🏆 Leaderboard</h3>
+          <p>Check your ranking and compete with others.</p>
         </Link>
       </div>
     </div>

@@ -22,62 +22,68 @@ const CodeEditor = ({ problem, user }) => {
     }
   }, [problem]);
 
-  const handleRun = async () => {
-    setRunning(true);
-    setOutput('');
-    setVerdict('');
+const handleRun = async () => {
+  setRunning(true);
+  setOutput('');
+  setVerdict('');
 
-    try {
-      const testCases = problem.test_cases
-        ? JSON.parse(problem.test_cases)
-        : [{ input, expected_output: problem.expected_output }];
+  try {
+    const testCases = problem.test_cases
+      ? JSON.parse(problem.test_cases)
+      : [{ input, expected_output: problem.expected_output }];
 
-      let allPassed = true;
-      let combined = '';
+    let allPassed = true;
+    let combined = '';
 
-      for (const tc of testCases) {
-        const res = await axios.post(
-          'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true',
-          {
-            source_code: code,
-            stdin: tc.input,
-            language_id: languageId,
+    for (const tc of testCases) {
+      const res = await axios.post(
+        'https://judge0-ce.p.rapidapi.com/submissions?base64_encoded=false&wait=true',
+        {
+          source_code: code,
+          stdin: tc.input,
+          language_id: languageId,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RapidAPI-Key': '19efc6ac41mshd0b8284c139aecbp158050jsn7e6f6aa3bc69',
+            'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
           },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'X-RapidAPI-Key': '19efc6ac41mshd0b8284c139aecbp158050jsn7e6f6aa3bc69',
-              'X-RapidAPI-Host': 'judge0-ce.p.rapidapi.com',
-            },
-          }
-        );
+        }
+      );
 
-        const out = (res.data.stdout || '').trim();
-        const exp = (tc.expected_output || '').trim();
-        combined += `🧪 Input:\n${tc.input}\n✅ Expected:\n${exp}\n💡 Actual:\n${out}\n\n`;
-        if (out !== exp) allPassed = false;
-      }
-
-      setOutput(combined.trim());
-      setVerdict(allPassed ? '✅ All test cases passed!' : '❌ Some test cases failed.');
-
-      if (user) {
-        await axios.post('http://localhost:5000/api/submissions', {
-          user_id: user.id,
-          problem_id: problem.id,
-          code,
-          output: combined.trim(),
-          is_correct: allPassed,
-        });
-      }
-    } catch (e) {
-      console.error(e);
-      setOutput('❌ Error running code.');
-      setVerdict('❌ Server error or invalid code.');
-    } finally {
-      setRunning(false);
+      const out = (res.data.stdout || '').trim();
+      const exp = (tc.expected_output || '').trim();
+      combined += `🧪 Input:\n${tc.input}\n✅ Expected:\n${exp}\n💡 Actual:\n${out}\n\n`;
+      if (out !== exp) allPassed = false;
     }
-  };
+
+    setOutput(combined.trim());
+    setVerdict(allPassed ? '✅ All test cases passed!' : '❌ Some test cases failed.');
+
+    if (user) {
+      await axios.post('http://localhost:5000/api/submissions', {
+        user_id: user.id,
+        problem_id: problem.id,
+        code,
+        output: combined.trim(),
+        is_correct: allPassed,
+      });
+    }
+
+    // ✅ Move the alert inside here
+    if (allPassed) {
+      alert('🎉 Problem solved! You earned 10 points!');
+    }
+
+  } catch (e) {
+    console.error(e);
+    setOutput('❌ Error running code.');
+    setVerdict('❌ Server error or invalid code.');
+  } finally {
+    setRunning(false);
+  }
+};
 
   if (!problem) return <div className="no-problem">🛑 Please select a problem to solve.</div>;
 

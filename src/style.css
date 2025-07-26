@@ -407,3 +407,65 @@ body {
   color: red;
   font-weight: bold;
 }
+.homepage-container {
+  padding: 20px;
+}
+
+.card-block {
+  background: #ffffff;
+  border-radius: 15px;
+  padding: 20px;
+  margin: 30px auto;
+  max-width: 700px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.leaderboard-container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #f8f9fa;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.leaderboard-title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+  color: #343a40;
+}
+
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.leaderboard-table thead {
+  background-color: #343a40;
+  color: white;
+}
+
+.leaderboard-table tr:nth-child(even) {
+  background-color: #f1f3f5;
+}
+
+.leaderboard-table tr:hover {
+  background-color: #e9ecef;
+}
+.link-text {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.link-text:hover {
+  color: #0056b3;
+}
